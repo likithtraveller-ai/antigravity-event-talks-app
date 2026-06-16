@@ -16,6 +16,8 @@ const refreshBtn = document.getElementById('refresh-btn');
 const refreshIcon = refreshBtn.querySelector('.icon-refresh');
 const statusText = document.getElementById('status-text');
 const pulseDot = document.querySelector('.pulse-dot');
+const themeToggleBtn = document.getElementById('theme-toggle-btn');
+const exportCsvBtn = document.getElementById('export-csv-btn');
 
 // Modal Elements
 const tweetModal = document.getElementById('tweet-modal');
@@ -32,6 +34,7 @@ const RING_CIRCUMFERENCE = 88; // 2 * PI * 14
 
 // Initialize App
 document.addEventListener('DOMContentLoaded', () => {
+    initTheme();
     fetchReleaseNotes();
     setupEventListeners();
 });
@@ -58,6 +61,16 @@ function setupEventListeners() {
     // Filters
     typeFilter.addEventListener('change', applyFilters);
     sortSelect.addEventListener('change', applyFilters);
+    
+    // Theme Switcher Toggle
+    if (themeToggleBtn) {
+        themeToggleBtn.addEventListener('click', toggleTheme);
+    }
+    
+    // Export CSV
+    if (exportCsvBtn) {
+        exportCsvBtn.addEventListener('click', exportToCSV);
+    }
 
     // Text selection detection for floating tweet button
     document.addEventListener('selectionchange', handleTextSelection);
@@ -236,14 +249,45 @@ function renderCards(notes) {
                         <polyline points="7 7 17 7 17 17"></polyline>
                     </svg>
                 </a>
-                <button class="btn btn-secondary btn-sm tweet-card-btn" title="Tweet this specific update">
-                    <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
-                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path>
-                    </svg>
-                    <span>Tweet</span>
-                </button>
+                <div class="card-actions-wrapper" style="display: flex; gap: 0.5rem;">
+                    <button class="btn btn-secondary btn-sm copy-card-btn" title="Copy release note text to clipboard">
+                        <svg class="icon-copy" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                        <span>Copy</span>
+                    </button>
+                    <button class="btn btn-secondary btn-sm tweet-card-btn" title="Tweet this specific update">
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+                            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path>
+                        </svg>
+                        <span>Tweet</span>
+                    </button>
+                </div>
             </div>
         `;
+        
+        // Event for card Copy Button
+        card.querySelector('.copy-card-btn').addEventListener('click', async (e) => {
+            const btn = e.currentTarget;
+            const originalText = btn.innerHTML;
+            try {
+                await navigator.clipboard.writeText(note.content_text);
+                btn.innerHTML = `
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    <span>Copied!</span>
+                `;
+                btn.classList.add('btn-copied');
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.classList.remove('btn-copied');
+                }, 2000);
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+            }
+        });
         
         // Event for card Tweet Button
         card.querySelector('.tweet-card-btn').addEventListener('click', () => {
@@ -488,4 +532,65 @@ function publishTweet() {
     const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
     window.open(twitterUrl, '_blank');
     closeTweetComposer();
+}
+
+// Theme Toggle Functionality
+function toggleTheme() {
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    
+    updateThemeIcon(newTheme);
+}
+
+function updateThemeIcon(theme) {
+    if (!themeToggleBtn) return;
+    const sunIcon = themeToggleBtn.querySelector('.icon-sun');
+    const moonIcon = themeToggleBtn.querySelector('.icon-moon');
+    
+    if (theme === 'light') {
+        sunIcon.style.display = 'none';
+        moonIcon.style.display = 'block';
+    } else {
+        sunIcon.style.display = 'block';
+        moonIcon.style.display = 'none';
+    }
+}
+
+function initTheme() {
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    updateThemeIcon(savedTheme);
+}
+
+// Export to CSV Functionality
+function exportToCSV() {
+    if (filteredNotes.length === 0) {
+        alert('No release notes to export.');
+        return;
+    }
+    
+    const headers = ['Date', 'Type', 'Link', 'Content'];
+    
+    const rows = filteredNotes.map(note => {
+        const date = note.date || '';
+        const type = note.type || '';
+        const link = note.link || '';
+        const content = (note.content_text || '').replace(/"/g, '""');
+        return `"${date}","${type}","${link}","${content}"`;
+    });
+    
+    const csvContent = [headers.join(','), ...rows].join('\n');
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `bigquery_release_notes_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 }

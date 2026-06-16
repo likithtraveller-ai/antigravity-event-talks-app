@@ -39,6 +39,120 @@
     --shadow-accent: 0 0 20px rgba(6, 182, 212, 0.15);
 }
 
+/* Light Theme Variables & Overrides */
+:root[data-theme="light"] {
+    --bg-base: #f1f5f9;
+    --bg-surface: rgba(255, 255, 255, 0.7);
+    --bg-surface-hover: rgba(255, 255, 255, 0.95);
+    --bg-card: rgba(255, 255, 255, 0.6);
+    --border-color: rgba(15, 23, 42, 0.08);
+    --border-color-hover: rgba(15, 23, 42, 0.16);
+    
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #64748b;
+    
+    /* Neon Colors adjusted for light theme visibility */
+    --accent-cyan: #0891b2;
+    --accent-indigo: #4f46e5;
+    --accent-purple: #7c3aed;
+    
+    /* Status Colors */
+    --color-feature: #059669;
+    --color-feature-glow: rgba(5, 150, 105, 0.1);
+    --color-fix: #2563eb;
+    --color-fix-glow: rgba(37, 99, 235, 0.1);
+    --color-issue: #d97706;
+    --color-issue-glow: rgba(217, 119, 6, 0.1);
+    --color-deprecation: #dc2626;
+    --color-deprecation-glow: rgba(220, 38, 38, 0.1);
+    --color-general: #6d28d9;
+    --color-general-glow: rgba(109, 40, 217, 0.1);
+
+    --shadow-premium: 0 10px 30px rgba(15, 23, 42, 0.06);
+    --shadow-accent: 0 0 20px rgba(8, 145, 178, 0.08);
+}
+
+:root[data-theme="light"] .glow-orb {
+    opacity: 0.12;
+}
+
+:root[data-theme="light"] .note-card::before {
+    background: radial-gradient(800px circle at var(--mouse-x, 0) var(--mouse-y, 0), rgba(15, 23, 42, 0.04), transparent 40%);
+}
+
+:root[data-theme="light"] .modal-container {
+    background: #ffffff;
+    border-color: rgba(15, 23, 42, 0.1);
+    box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.15);
+}
+
+:root[data-theme="light"] .modal-header h3 {
+    color: #0f172a;
+}
+
+:root[data-theme="light"] .composer-label {
+    color: #475569;
+}
+
+:root[data-theme="light"] #tweet-textarea {
+    background: rgba(15, 23, 42, 0.02);
+    border-color: rgba(15, 23, 42, 0.1);
+    color: #0f172a;
+}
+
+:root[data-theme="light"] #tweet-textarea:focus {
+    background: rgba(15, 23, 42, 0.04);
+}
+
+:root[data-theme="light"] .close-modal-btn {
+    color: #64748b;
+}
+
+:root[data-theme="light"] .close-modal-btn:hover {
+    color: #0f172a;
+}
+
+:root[data-theme="light"] .preview-header-title {
+    color: #64748b;
+}
+
+:root[data-theme="light"] .twitter-card {
+    background-color: #ffffff;
+    border-color: rgba(15, 23, 42, 0.15);
+    color: #0f172a;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+}
+
+:root[data-theme="light"] .tweet-display-name {
+    color: #0f172a;
+}
+
+:root[data-theme="light"] .twitter-logo {
+    color: #0f172a;
+}
+
+:root[data-theme="light"] .tweet-link-card {
+    border-color: rgba(15, 23, 42, 0.15);
+}
+
+:root[data-theme="light"] .tweet-link-card:hover {
+    background-color: rgba(15, 23, 42, 0.02);
+}
+
+:root[data-theme="light"] .link-card-image {
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+    border-bottom-color: rgba(15, 23, 42, 0.15);
+}
+
+:root[data-theme="light"] .link-card-title {
+    color: #0f172a;
+}
+
+:root[data-theme="light"] .tweet-actions-row {
+    border-top-color: rgba(15, 23, 42, 0.1);
+}
+
 /* Reset & Base Styles */
 * {
     margin: 0;
